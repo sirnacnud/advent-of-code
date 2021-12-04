@@ -1,78 +1,50 @@
-#include <bitset>
 #include <iostream>
 #include <fstream>
 #include <string>
 #include <vector>
 
-void printBitset(std::vector<std::bitset<1>>& bitset) {
-    for (std::size_t i = 0; i < bitset.size(); ++i) {
-        std::cout << bitset[i];
-    }
-
-    std::cout << std::endl;
-}
-
-std::vector<std::bitset<1>> convertStringToBinary(const std::string& string) {
-    std::vector<std::bitset<1>> bitsets;
-    for (std::size_t i = 0; i < string.size(); ++i) {
-        bitsets.push_back(std::bitset<1>(string[i]));
-    }
-
-    return bitsets;
-}
-
-int convertBitsetToInt(std::vector<std::bitset<1>>& bitset) {
+int convertBinaryStringToInt(const std::string& string) {
     int value = 0;
+    size_t length = string.size();
 
-    for (std::size_t i = 0; i < bitset.size(); ++i) {
-        if (bitset[i] == 1) {
-            value |= 1 << (bitset.size() - i - 1);        
+    for (std::size_t i = 0; i < length; ++i) {
+        if (string[i] == '1') {
+            value |= 1 << (length - i - 1); 
         }
     }
 
     return value;
 }
 
-int calculatePowerConsumption(std::vector<std::vector<std::bitset<1>>>& readings) {
-    
-    std::vector<std::bitset<1>> gammaRate;
-    std::vector<std::bitset<1>> epsilonRate;
+int calculatePowerConsumption(std::vector<int>& readings, int numberOfBits) {
+    int gammaRate = 0;
+    int epsilonRate = 0;
 
-    int index = 0;
-
-    for (std::size_t i = 0; i < readings[index].size(); ++i) {
+    for (std::size_t i = 0; i < numberOfBits; ++i) {
         int onesCount = 0;
         int zeroesCount = 0;
 
+        int bitTest = 1 << (numberOfBits - i - 1);
+
         for (std::size_t j = 0; j < readings.size(); ++j) {
-            if (readings[j][index][0] == 0) {
-                zeroesCount++;            
+            if (readings[j] & bitTest) {
+                onesCount++;            
             } else {
-                onesCount++;
+                zeroesCount++;
             }
         }
 
         if (onesCount > zeroesCount) {
-            gammaRate.push_back(std::bitset<1>(1));
-            epsilonRate.push_back(std::bitset<1>(0));
+            gammaRate |= bitTest;
         } else {
-            gammaRate.push_back(std::bitset<1>(0));
-            epsilonRate.push_back(std::bitset<1>(1));
+            epsilonRate |= bitTest;
         }
-
-        index++;
     }
 
-    printBitset(gammaRate);
-    printBitset(epsilonRate);
+    std::cout << "Gamma Rate: " << gammaRate << std::endl;
+    std::cout << "Epsilon Rate: " << epsilonRate << std::endl;
 
-    int gammaValue = convertBitsetToInt(gammaRate);
-    int epsilonValue = convertBitsetToInt(epsilonRate);
-
-    std::cout << gammaValue << std::endl;
-    std::cout << epsilonValue << std::endl;
-
-    return gammaValue * epsilonValue;
+    return gammaRate * epsilonRate;
 }
 
 int main(int argc, char* argv[]) {
@@ -86,16 +58,16 @@ int main(int argc, char* argv[]) {
 
     if (inputFile.is_open()) {
         std::string line;
+        std::vector<int> readings;
+        int numberOfBits = 0;
 
-        std::vector<std::vector<std::bitset<1>>> readings;
-
-        while (inputFile.good()) {
-            inputFile >> line;
-            std::vector<std::bitset<1>> reading = convertStringToBinary(line);
+        while (getline(inputFile, line)) {
+            numberOfBits = line.size();
+            int reading = convertBinaryStringToInt(line);
             readings.push_back(reading);
         }
 
-        int powerConsumption = calculatePowerConsumption(readings);
-        std::cout << powerConsumption << std::endl;
+        int powerConsumption = calculatePowerConsumption(readings, numberOfBits);
+        std::cout << "Power Consumption: " << powerConsumption << std::endl;
     }
 }
