@@ -16,7 +16,7 @@ int convertBinaryStringToInt(const std::string& string) {
     return value;
 }
 
-int calculatePowerConsumption(std::vector<int>& readings, int numberOfBits) {
+int calculatePowerConsumption(const std::vector<int>& readings, int numberOfBits) {
     int gammaRate = 0;
     int epsilonRate = 0;
 
