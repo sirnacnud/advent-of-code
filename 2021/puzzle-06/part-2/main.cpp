@@ -1,4 +1,3 @@
-#include <cstring>
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -28,51 +27,22 @@ uint64_t simulateFishPopulation(std::vector<int>& fish, int days) {
     int remainingDays = days;
 
     uint64_t fishCounts[MAX_NUMBER_FISH_GROUPS] = {};
-    uint64_t newFishCounts[MAX_NUMBER_FISH_GROUPS] = {};
 
     for (size_t i = 0; i < fish.size(); ++i) {
-        switch (fish[i]) {
-        case 0:
-            fishCounts[0] +=1;
-            break;
-        case 1:
-            fishCounts[1] += 1;
-            break;
-        case 2:
-            fishCounts[2] += 1;
-            break;
-        case 3:
-            fishCounts[3] += 1;
-            break;
-        case 4:
-            fishCounts[4] += 1;
-            break;
-        case 5:
-            fishCounts[5] += 1;
-            break;
-        case 6:
-            fishCounts[6] += 1;
-            break;
-        case 7:
-            fishCounts[7] += 1;
-            break;
-        case 8:
-            fishCounts[8] += 1;
-            break;
+        if (fish[i] >= 0 && fish[i] < MAX_NUMBER_FISH_GROUPS) {
+            fishCounts[fish[i]] += 1;
         }
     }
 
     while(remainingDays > 0) {
-        for (int i = 8; i >= 0; --i) {
-            if (i == 0) {
-                newFishCounts[8] = fishCounts[0];
-                newFishCounts[6] += fishCounts[0];
-            } else {
-                newFishCounts[i - 1] = fishCounts[i];
-            }
+        uint64_t zeroCount = fishCounts[0];
+
+        for (int i = 0; i <= 8; ++i) {
+            fishCounts[i] = fishCounts[i + 1];        
         }
-    
-        memcpy(&fishCounts, &newFishCounts, sizeof(uint64_t) * MAX_NUMBER_FISH_GROUPS);
+
+        fishCounts[6] += zeroCount;
+        fishCounts[8] = zeroCount;
 
         remainingDays -=1;    
     }
