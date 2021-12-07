@@ -67,17 +67,19 @@ void removeDiagonalLines(std::vector<Line>& lines) {
     });
 }
 
-void orientLines(std::vector<Line>& lines) {
-    for (size_t i = 0; i < lines.size(); ++i) {
-        Line& line = lines[i];
+bool markPointOnCoordinateSpace(int** space, int x, int y) {
+    bool isFirstIntersection = false;    
 
-        // Swap coordinates so they go from 0,0 to x,y
-        if (line.start.x > line.end.x || line.start.y > line.end.y) {
-            Coordinate start = line.start;
-            line.start = line.end;
-            line.end = start;     
+    if (space[y][x] != 0) {
+        if (space[y][x] == 1) {
+            isFirstIntersection = true;               
         }
+        space[y][x] += 1;
+    } else {
+        space[y][x] = 1;
     }
+
+    return isFirstIntersection;
 }
 
 int applyLineToCoordinateSpace(int** space, const Line& line) {
@@ -85,27 +87,22 @@ int applyLineToCoordinateSpace(int** space, const Line& line) {
 
     // Vertical line
     if (line.start.x == line.end.x) {
-        //std::cout << "Vertical: " << line.start.x << ',' << line.start.y << " -> " << line.end.x << "," << line.end.y << std::endl;   
-        for(size_t i = line.start.y; i <= line.end.y; ++i) {
-            if (space[i][line.start.x] != 0) {
-                if (space[i][line.start.x] == 1) {
-                    pointsOverlapping += 1;                
-                }
-                space[i][line.start.x] += 1;
-            } else {
-                space[i][line.start.x] = 1;
+        int start = std::min(line.start.y, line.end.y);
+        int end = std::max(line.start.y, line.end.y);
+   
+        for(int y = start; y <= end; ++y) {
+            if (markPointOnCoordinateSpace(space, line.start.x, y)) {
+                pointsOverlapping += 1;            
             }
         }
+    // Horizontal line
     } else {
-        //std::cout << "Horizontal: " << line.start.x << ',' << line.start.y << " -> " << line.end.x << "," << line.end.y << std::endl;  
-        for(size_t i = line.start.x; i <= line.end.x; ++i) {
-            if (space[line.start.y][i] != 0) {
-                if (space[line.start.y][i] == 1) {
-                    pointsOverlapping += 1;
-                }
-                space[line.start.y][i] += 1;
-            } else {
-                space[line.start.y][i] = 1;
+        int start = std::min(line.start.x, line.end.x);
+        int end = std::max(line.start.x, line.end.x);
+  
+        for(int x = start; x <= end; ++x) {
+            if (markPointOnCoordinateSpace(space, x, line.start.y)) {
+                pointsOverlapping += 1;            
             }
         }
     }
@@ -166,39 +163,25 @@ int main(int argc, char* argv[]) {
         }
 
         removeDiagonalLines(lines);
-        orientLines(lines);
-
-        /*for (size_t i = 0; i < lines.size(); ++i) {
-            std::cout << lines[i].start.x << ',' << lines[i].start.y << " -> " << lines[i].end.x << "," << lines[i].end.y << std::endl;        
-        }*/
 
         Coordinate max = {};
         for (size_t i = 0; i < lines.size(); ++i) {
-            max.x = std::max(lines[i].end.x, max.x);
-            max.y = std::max(lines[i].end.y, max.y);
+            max.x = std::max(std::max(lines[i].start.x, lines[i].end.x), max.x);
+            max.y = std::max(std::max(lines[i].start.y, lines[i].end.y), max.y);
         }
-
-        std::cout << max.x << "," << max.y << std::endl;
 
         int rows = max.y + 1;
         int columns = max.x + 1;
 
-        std::cout << rows << " x " << columns << std::endl;
-
         int** coordinateSpace = createCoordinateSpace(rows, columns);
 
         int overlappingPoints = 0;
-
-        //printCoordinateSpace(coordinateSpace, rows, columns);
-
         for (size_t i = 0; i < lines.size(); ++i) {
             overlappingPoints += applyLineToCoordinateSpace(coordinateSpace, lines[i]);
         }
 
-        //printCoordinateSpace(coordinateSpace, rows, columns);
+        std::cout << overlappingPoints << std::endl;
 
         freeCoordinateSpace(coordinateSpace, columns);
-
-        std::cout << overlappingPoints << std::endl;
     }
 }
