@@ -66,7 +66,7 @@ TargetArea parseTargetArea(const std::string& line) {
     return targetArea;
 }
 
-int findInitialVelocitiestHittingTarget(const TargetArea& targetArea) {
+int findInitialVelocitiesHittingTarget(const TargetArea& targetArea) {
     int count = 0;
 
     for (int x = 1; x <= targetArea.maxX; ++x) {
@@ -94,7 +94,7 @@ int main(int argc, char* argv[]) {
         std::string line;
         if (getline(inputFile, line)) {
             TargetArea targetArea = parseTargetArea(line);
-            int velocities = findInitialVelocitiestHittingTarget(targetArea);
+            int velocities = findInitialVelocitiesHittingTarget(targetArea);
             std::cout << velocities << std::endl;
         }
     }
