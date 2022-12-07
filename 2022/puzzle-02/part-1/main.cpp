@@ -17,22 +17,18 @@ std::pair<Play, Play> parseRoundFromLine(const std::string& line) {
 
     std::pair<Play, Play> round;
     while (getline(ss, s, ' ')) {
-        try {
-            if (s == "A") {
-                round.first = rock;
-            } else if (s == "B") {
-                round.first = paper;            
-            } else if (s == "C") {
-                round.first = scissor;            
-            } else if (s == "X") {
-                round.second = rock;            
-            } else if (s == "Y") {
-                round.second = paper;
-            } else if (s == "Z") {
-                round.second = scissor;            
-            }
-        } catch (const std::invalid_argument& e) {
-            continue;        
+        if (s == "A") {
+            round.first = rock;
+        } else if (s == "B") {
+            round.first = paper;            
+        } else if (s == "C") {
+            round.first = scissor;            
+        } else if (s == "X") {
+            round.second = rock;            
+        } else if (s == "Y") {
+            round.second = paper;
+        } else if (s == "Z") {
+            round.second = scissor;            
         }
     }
 
