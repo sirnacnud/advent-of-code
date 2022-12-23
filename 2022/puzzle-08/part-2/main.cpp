@@ -5,62 +5,46 @@
 
 #include "../../utils/InputReader.hpp"
 
-bool checkIfVisibleFromOutside(const std::vector<std::string>& grid, int x, int y) {
+int findScenicScore(const std::vector<std::string>& grid, int x, int y) {
     char height = grid[y][x];
 
     // Check top
-    bool topBlocked = false;
+    int topDistance = 0;
     for (int row = y - 1; row >= 0; --row) {
+        topDistance++;
         if (grid[row][x] >= height) {
-            topBlocked = true;
             break;
         }
-    }
-
-    if (!topBlocked) {
-        return true;
     }
 
     // Check botton
-    bool bottomBlocked = false;
+    int bottomDistance = 0;
     for (int row = y + 1; row < grid.size(); ++row) {
+        bottomDistance++;
         if (grid[row][x] >= height) {
-            bottomBlocked = true;
             break;
         }
-    }
-
-    if (!bottomBlocked) {
-        return true;
     }
 
     // Check right
-    bool rightBlocked = false;
+    int rightDistance = 0;
     for (int col = x + 1; col < grid[y].size(); ++col) {
+        rightDistance++;
         if (grid[y][col] >= height) {
-            rightBlocked = true;
             break;
         }
-    }
-
-    if (!rightBlocked) {
-        return true;
     }
 
      // Check left
-    bool leftBlocked = false;
+    int leftDistance = 0;
     for (int col = x - 1; col >= 0; --col) {
+        leftDistance++;
         if (grid[y][col] >= height) {
-            leftBlocked = true;
             break;
         }
     }
 
-    if (!leftBlocked) {
-        return true;
-    }
-
-    return false;
+    return (topDistance * bottomDistance * rightDistance * leftDistance);
 }
 
 int main(int argc, char* argv[]) {
@@ -71,18 +55,18 @@ int main(int argc, char* argv[]) {
 
     if (result == 0) {
         int columnCount = lines[0].size();
-        int rowCount = lines.size();
-        int visibleCount = (columnCount * 2) + ((rowCount - 2) * 2);
+        int maxScore = 0;
 
         for (int j = 1; j <= lines.size() - 2; ++j) {
             for (int i = 1; i <= columnCount - 2; ++i) {
-                if (checkIfVisibleFromOutside(lines, j, i)) {
-                    visibleCount++;
+                int score = findScenicScore(lines, j, i);
+                if (score > maxScore) {
+                    maxScore = score;
                 }
             }
         }
 
-        std::cout << visibleCount << std::endl;
+        std::cout << maxScore << std::endl;
     }
 
     return result;
